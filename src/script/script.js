@@ -1,5 +1,6 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const bg = document.getElementById('background');
+let ratio =  window.innerHeight / window.innerWidth;
+const ctx = bg.getContext('2d');
 
 fetch('images/map.jpg')
 .then((response) => response.blob())
@@ -7,8 +8,10 @@ fetch('images/map.jpg')
     let img = new Image();
     img.src = URL.createObjectURL(blob);
     img.onload = () => {
-        canvas.width = img.naturalWidth / 4;
-        canvas.height = img.naturalHeight / 4;
+        let width = Math.floor(img.naturalWidth / 4);
+        let height = Math.ceil(img.naturalWidth / 4 * ratio);
+        bg.width = width;
+        bg.height = height;
         ctx.drawImage(img, 0, 0);
     }
 });
