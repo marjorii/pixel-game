@@ -15,7 +15,10 @@ class Game {
         this.ctxFg = foreground.getContext('2d');
         this.loadMap(fileName).then((img) => {
             this.setupScreen(img.naturalWidth);
-            this.render(img);
+            this.ctxBg.drawImage(img, 0, 0);
+            // this.render();
+            this.animate();
+            console.log(getRandInt(10));
         });
     }
 
@@ -41,17 +44,29 @@ class Game {
         this.fg.height = height * this.scale;
     }
 
-    render(img) {
+    render() {
         const scale = this.scale;
         const pix = this.pix;
-        this.ctxBg.drawImage(img, 0, 0);
+        this.ctxFg.save();
+        this.ctxFg.clearRect(0, 0, this.fg.width, this.fg.height);
         // Trick to draw perfect pixel
         this.ctxFg.translate(-0.5, -0.5);
         this.ctxFg.scale(scale, scale);
         // Set thickness to 1 true px
         this.ctxFg.lineWidth = 1 / scale;
-        this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
+        this.ctxFg.strokeRect(getRandInt(10), getRandInt(6), 1.25, 1.25);
+        // this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
+        this.ctxFg.restore();
     }
+
+    animate() {
+        requestAnimationFrame(this.animate.bind(this));
+        this.render();
+    }
+}
+
+function getRandInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
 }
 
 export { Game };
