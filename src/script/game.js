@@ -1,6 +1,7 @@
 class Game {
     constructor() {
         this.scale = 4;
+        this.screenScale = null;
         this.pix = { x: 2, y: 3 };
         this.bg = null;
         this.fg = null;
@@ -19,7 +20,8 @@ class Game {
             // this.render();
             this.animate();
             document.addEventListener('keydown', this.onKeyDown.bind(this));
-        });
+            document.addEventListener('click', this.onClick.bind(this));
+            });
     }
 
     loadMap(fileName) {
@@ -42,6 +44,8 @@ class Game {
         this.bg.height = height;
         this.fg.width = width * this.scale;
         this.fg.height = height * this.scale;
+
+        this.screenScale = window.innerWidth / imgWidth;
     }
 
     render() {
@@ -66,7 +70,6 @@ class Game {
     }
 
     onKeyDown(e) {
-        console.log(this.pix.x, this.pix.y);
         if (e.code == 'ArrowRight') {
             this.pix.x += 1;
         }
@@ -79,6 +82,13 @@ class Game {
         else if (e.code == 'ArrowDown') {
             this.pix.y += 1;
         }
+    }
+
+    onClick(e) {
+        const x = e.clientX;
+        const y = e.clientY;
+        this.pix.x = Math.floor(x / this.screenScale);
+        this.pix.y = Math.floor(y / this.screenScale);
     }
 }
 
