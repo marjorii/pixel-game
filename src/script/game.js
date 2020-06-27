@@ -18,7 +18,7 @@ class Game {
             this.ctxBg.drawImage(img, 0, 0);
             // this.render();
             this.animate();
-            console.log(getRandInt(10));
+            document.addEventListener('keydown', this.onKeyDown.bind(this));
         });
     }
 
@@ -54,14 +54,31 @@ class Game {
         this.ctxFg.scale(scale, scale);
         // Set thickness to 1 true px
         this.ctxFg.lineWidth = 1 / scale;
-        this.ctxFg.strokeRect(getRandInt(10), getRandInt(6), 1.25, 1.25);
-        // this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
+        // this.ctxFg.strokeRect(getRandInt(10), getRandInt(6), 1.25, 1.25);
+        this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
         this.ctxFg.restore();
     }
+
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         this.render();
+    }
+
+    onKeyDown(e) {
+        console.log(this.pix.x, this.pix.y);
+        if (e.code == 'ArrowRight') {
+            this.pix.x += 1;
+        }
+        else if (e.code == 'ArrowLeft') {
+            this.pix.x -= 1;
+        }
+        else if (e.code == 'ArrowUp') {
+            this.pix.y -= 1;
+        }
+        else if (e.code == 'ArrowDown') {
+            this.pix.y += 1;
+        }
     }
 }
 
