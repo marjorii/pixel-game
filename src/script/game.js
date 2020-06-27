@@ -7,6 +7,7 @@ class Game {
         this.fg = null;
         this.ctxBg = null;
         this.ctxFg = null;
+        this.samePixelsPos = [];
     }
 
     init(background, foreground, fileName) {
@@ -37,7 +38,6 @@ class Game {
     }
 
     setupScreen() {
-        console.log(this.img);
         const imgWidth = this.img.naturalWidth;
         const ratio =  window.innerHeight / window.innerWidth;
         const width = Math.floor(imgWidth / 1);
@@ -63,6 +63,10 @@ class Game {
         this.ctxFg.lineWidth = 1 / scale;
         // this.ctxFg.strokeRect(getRandInt(10), getRandInt(6), 1.25, 1.25);
         this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
+        this.samePixelsPos.forEach((px) => {
+            this.ctxFg.strokeStyle = 'red';
+            this.ctxFg.strokeRect(px[0], px[1], 1.25, 1.25);
+        });
         this.ctxFg.restore();
     }
 
@@ -85,6 +89,9 @@ class Game {
         else if (e.code == 'ArrowDown') {
             this.pix.y += 1;
         }
+        else if (e.code == 'Space') {
+            this.samePixelsPos = this.getPixelsWithSameColor(this.pix.x, this.pix.y);
+        }
     }
 
     onClick(e) {
@@ -93,7 +100,43 @@ class Game {
         this.pix.x = Math.floor(x / this.screenScale);
         this.pix.y = Math.floor(y / this.screenScale);
     }
+
+    getScreenData() {
+        return this.ctxBg.getImageData(0, 0, this.bg.width, this.bg.height)
+    }
+
+    getPixColor() {
+        return this.ctxBg.getImageData(this.pix.x, this.pix.y, 1, 1).data;
+    }
+
+    getPixelsWithSameColor(posX, posY) {
+        const samePixelsPos = [];
+        const { width, height, data } = this.getScreenData();
+        const posAsIndex = (posY * width + posX) * 4;
+        const baseColor = data.slice(posAsIndex, posAsIndex + 4);
+        for (let i = 0, len = data.length; i < len ; i += 4) {
+            if (i == posAsIndex) {
+                continue;
+            }
+            let currentColor = data.slice(i, i + 4);
+            if (arraysAreEqual(baseColor, currentColor, 4)) {
+                let x = i / 4 % width;
+                let y = Math.floor(i / 4 / width);
+                samePixelsPos.push([x, y]);
+            }
+        }
+        return samePixelsPos;
+    }
 }
+
+
+function arraysAreEqual(arr1, arr2, len) {
+    for (let i = 0; i < len; i++) {
+        if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+}
+
 
 function getRandInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
