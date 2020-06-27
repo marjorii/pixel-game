@@ -15,13 +15,13 @@ class Game {
         this.ctxBg = background.getContext('2d');
         this.ctxFg = foreground.getContext('2d');
         this.loadMap(fileName).then((img) => {
-            this.setupScreen(img.naturalWidth);
-            this.ctxBg.drawImage(img, 0, 0);
-            // this.render();
+            this.img = img;
+            this.setupScreen();
             this.animate();
+            window.addEventListener('resize', this.setupScreen.bind(this));
             document.addEventListener('keydown', this.onKeyDown.bind(this));
             document.addEventListener('click', this.onClick.bind(this));
-            });
+        });
     }
 
     loadMap(fileName) {
@@ -36,7 +36,9 @@ class Game {
         })
     }
 
-    setupScreen(imgWidth) {
+    setupScreen() {
+        console.log(this.img);
+        const imgWidth = this.img.naturalWidth;
         const ratio =  window.innerHeight / window.innerWidth;
         const width = Math.floor(imgWidth / 1);
         const height = Math.ceil(imgWidth / 1 * ratio);
@@ -45,6 +47,7 @@ class Game {
         this.fg.width = width * this.scale;
         this.fg.height = height * this.scale;
 
+        this.ctxBg.drawImage(this.img, 0, 0);
         this.screenScale = window.innerWidth / imgWidth;
     }
 
