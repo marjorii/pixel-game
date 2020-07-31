@@ -62,11 +62,12 @@ class Game {
         // Set thickness to 1 true px
         this.ctxFg.lineWidth = 1 / scale;
         // this.ctxFg.strokeRect(getRandInt(10), getRandInt(6), 1.25, 1.25);
-        this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
+        this.ctxFg.strokeStyle = 'red';
         this.samePixelsPos.forEach((px) => {
-            this.ctxFg.strokeStyle = 'red';
-            this.ctxFg.strokeRect(px[0], px[1], 1.25, 1.25);
+            this.ctxFg.strokeRect(px.x, px.y, 1.25, 1.25);
         });
+        this.ctxFg.strokeStyle = 'black';
+        this.ctxFg.strokeRect(pix.x, pix.y, 1.25, 1.25);
         this.ctxFg.restore();
     }
 
@@ -89,16 +90,19 @@ class Game {
         else if (e.code == 'ArrowDown') {
             this.pix.y += 1;
         }
-        else if (e.code == 'Space') {
+        if (e.code.includes('Arrow')) {
             this.samePixelsPos = this.getPixelsWithSameColor(this.pix.x, this.pix.y);
         }
     }
 
     onClick(e) {
-        const x = e.clientX;
-        const y = e.clientY;
-        this.pix.x = Math.floor(x / this.screenScale);
-        this.pix.y = Math.floor(y / this.screenScale);
+        const x = Math.floor(e.clientX / this.screenScale);
+        const y = Math.floor(e.clientY / this.screenScale);
+        if (this.samePixelsPos.some(pos => pos.x == x && pos.y == y)) {
+            this.pix.x = x;
+            this.pix.y = y;
+            this.samePixelsPos = this.getPixelsWithSameColor(this.pix.x, this.pix.y);
+        }
     }
 
     getScreenData() {
@@ -122,7 +126,7 @@ class Game {
             if (arraysAreEqual(baseColor, currentColor, 4)) {
                 let x = i / 4 % width;
                 let y = Math.floor(i / 4 / width);
-                samePixelsPos.push([x, y]);
+                samePixelsPos.push({x, y});
             }
         }
         return samePixelsPos;
