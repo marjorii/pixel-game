@@ -8,8 +8,7 @@ class Game {
         this.ctxBg = null;
         this.ctxFg = null;
         this.samePixelsPos = [];
-        this.virus = [5, 5];
-        this.animationStart = 0;
+        this.virus = [[5, 1]];
     }
 
     init(background, foreground, fileName) {
@@ -21,6 +20,8 @@ class Game {
             this.img = img;
             this.setupScreen();
             this.animate();
+            setInterval(this.renderVirus.bind(this), 100);
+            setInterval(this.propagateVirus.bind(this), 2000);
             window.addEventListener('resize', this.setupScreen.bind(this));
             document.addEventListener('keydown', this.onKeyDown.bind(this));
             document.addEventListener('click', this.onClick.bind(this));
@@ -40,17 +41,14 @@ class Game {
     }
 
     setupScreen() {
-        const imgWidth = this.img.naturalWidth;
-        const ratio =  window.innerHeight / window.innerWidth;
-        const width = Math.floor(imgWidth / 1);
-        const height = Math.ceil(imgWidth / 1 * ratio);
+        const [width, height] = this.getImageSize();
         this.bg.width = width;
         this.bg.height = height;
         this.fg.width = width * this.scale;
         this.fg.height = height * this.scale;
 
         this.ctxBg.drawImage(this.img, 0, 0);
-        this.screenScale = window.innerWidth / imgWidth;
+        this.screenScale = window.innerWidth / this.img.naturalWidth;
     }
 
     render() {
@@ -74,18 +72,38 @@ class Game {
     }
 
     renderVirus() {
-        // template literal
-        this.ctxBg.fillStyle = `rgb(${getRandInt(255)}, ${getRandInt(255)}, ${getRandInt(255)})`;
-        // this.ctxBg.fillStyle = 'rgb(' + getRandInt(255) + ', ' + getRandInt(255) + ', ' + getRandInt(255) + ')';
-        this.ctxBg.fillRect(this.virus[0], this.virus[1], 1, 1);
+        for (var i = 0; i < this.virus.length; i++) {
+            // template literal
+            this.ctxBg.fillStyle = `rgb(${getRandInt(255)}, ${getRandInt(255)}, ${getRandInt(255)})`;
+            // this.ctxBg.fillStyle = 'rgb(' + getRandInt(255) + ', ' + getRandInt(255) + ', ' + getRandInt(255) + ')';
+            this.ctxBg.fillRect(this.virus[i][0], this.virus[i][1], 1, 1);
+        }
     }
 
-    animate(timestamp) {
-        const progress = timestamp - this.animationStart;
-        if (progress > 100) {
-            this.renderVirus();
-            this.animationStart = timestamp;
+    propagateVirus() {
+        const viruses = this.virus;
+        function virusInArray(x, y) {
+            return viruses.some((virus) => {
+                return virus[0] == x && virus[1] == y;
+            });
         }
+
+        const [width, height] = this.getImageSize();
+        const positions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        const virusActualLength = viruses.length;
+        for (var virusIndex = 0; virusIndex < virusActualLength; virusIndex++) {
+            const virus = viruses[virusIndex];
+            positions.forEach( (pos) => {
+                const x = virus[0] + pos[0];
+                const y = virus[1] + pos[1];
+                if (((x < width && x > -1) && (y < height && y > -1)) && !virusInArray(x, y)) {
+                    this.virus.push([x, y]);
+                }
+            });
+        }
+    }
+
+    animate() {
         requestAnimationFrame(this.animate.bind(this));
         this.render();
     }
@@ -116,6 +134,14 @@ class Game {
             this.pix.y = y;
             this.samePixelsPos = this.getPixelsWithSameColor(this.pix.x, this.pix.y);
         }
+    }
+
+    getImageSize() {
+        const imgWidth = this.img.naturalWidth;
+        const ratio =  window.innerHeight / window.innerWidth;
+        const width = Math.floor(imgWidth / 1);
+        const height = Math.ceil(imgWidth / 1 * ratio);
+        return [width, height];
     }
 
     getScreenData() {
