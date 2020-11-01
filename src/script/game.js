@@ -8,6 +8,8 @@ class Game {
         this.ctxBg = null;
         this.ctxFg = null;
         this.samePixelsPos = [];
+        this.virus = [5, 5];
+        this.animationStart = 0;
     }
 
     init(background, foreground, fileName) {
@@ -71,26 +73,37 @@ class Game {
         this.ctxFg.restore();
     }
 
+    renderVirus() {
+        // template literal
+        this.ctxBg.fillStyle = `rgb(${getRandInt(255)}, ${getRandInt(255)}, ${getRandInt(255)})`;
+        // this.ctxBg.fillStyle = 'rgb(' + getRandInt(255) + ', ' + getRandInt(255) + ', ' + getRandInt(255) + ')';
+        this.ctxBg.fillRect(this.virus[0], this.virus[1], 1, 1);
+    }
 
-    animate() {
+    animate(timestamp) {
+        const progress = timestamp - this.animationStart;
+        if (progress > 100) {
+            this.renderVirus();
+            this.animationStart = timestamp;
+        }
         requestAnimationFrame(this.animate.bind(this));
         this.render();
     }
 
     onKeyDown(e) {
-        if (e.code == 'ArrowRight') {
+        if (e.code == 'ArrowRight' || e.code == 'KeyD') {
             this.pix.x += 1;
         }
-        else if (e.code == 'ArrowLeft') {
+        else if (e.code == 'ArrowLeft' || e.code == 'KeyA') {
             this.pix.x -= 1;
         }
-        else if (e.code == 'ArrowUp') {
+        else if (e.code == 'ArrowUp' || e.code == 'KeyW') {
             this.pix.y -= 1;
         }
-        else if (e.code == 'ArrowDown') {
+        else if (e.code == 'ArrowDown' || e.code == 'KeyS') {
             this.pix.y += 1;
         }
-        if (e.code.includes('Arrow')) {
+        if (e.code.includes('Arrow') || ['D', 'A', 'W', 'S'].includes(e.code.replace('Key', ''))) {
             this.samePixelsPos = this.getPixelsWithSameColor(this.pix.x, this.pix.y);
         }
     }
