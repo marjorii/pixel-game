@@ -109,17 +109,19 @@ class Game {
     }
 
     onKeyDown(e) {
+        const [width, height] = this.getImageSize();
+        console.log(width, height);
         if (e.code == 'ArrowRight' || e.code == 'KeyD') {
-            this.pix.x += 1;
+            this.pix.x += this.pix.x + 1 < width ? 1 : 0;
         }
         else if (e.code == 'ArrowLeft' || e.code == 'KeyA') {
-            this.pix.x -= 1;
+            this.pix.x -= this.pix.x > 0 ? 1 : 0;
         }
         else if (e.code == 'ArrowUp' || e.code == 'KeyW') {
-            this.pix.y -= 1;
+            this.pix.y -= this.pix.y > 0 ? 1 : 0;
         }
         else if (e.code == 'ArrowDown' || e.code == 'KeyS') {
-            this.pix.y += 1;
+            this.pix.y += this.pix.y + 1 < height ? 1 : 0;
         }
         if (e.code.includes('Arrow') || ['D', 'A', 'W', 'S'].includes(e.code.replace('Key', ''))) {
             this.samePixelsPos = this.getPixelsWithSameColor(this.pix.x, this.pix.y);

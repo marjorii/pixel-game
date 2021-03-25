@@ -6,7 +6,3 @@ window.onload = function() {
     const fg = document.getElementById('foreground');
     game.init(bg, fg, 'images/map.jpg');
 }
-
-// To do :
-// Si la position d'un nouveau virus est en dehors de l'image, ne pas l'ajouter.
-// Ne pas ajouter un virus s'il est déjà dans virus.
